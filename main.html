@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+  <title>Gnoke DataForge</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Playfair+Display:wght@600;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="css/theme.css"/>
+  <link rel="stylesheet" href="css/layout.css"/>
+  <link rel="stylesheet" href="css/menu.css"/>
+  <link rel="stylesheet" href="css/table.css"/>
+  <link rel="stylesheet" href="css/modals.css"/>
+  <link rel="stylesheet" href="css/mobile.css"/>
+
+  <!-- Anti-FOUC: apply saved theme before paint -->
+  <script>
+    (function(){
+      var t = localStorage.getItem('gnoke_dataforge_theme');
+      if (t) document.documentElement.setAttribute('data-theme', t);
+    })();
+  </script>
+
+  <!-- External libs -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.3/sql-wasm.js"></script>
+</head>
+<body>
+
+<!-- ── Demo Banner ─────────────────────────────────────────────────── -->
+<div id="demo-banner">
+  <span>🗄️ You're viewing demo data — edit freely or start fresh via File → New.</span>
+  <button class="dismiss" onclick="this.closest('#demo-banner').style.display='none'">✕</button>
+</div>
+
+<!-- ── Top Bar ─────────────────────────────────────────────────────── -->
+<div id="topbar">
+  <button id="hamburger" title="Menu" onclick="Drawer.open()">&#9776;</button>
+
+  <div id="brand">
+    <span id="brand-gnoke">Gnoke</span>
+    <span id="brand-app">DataForge</span>
+  </div>
+
+  <span id="filename-display">New</span>
+
+  <!-- Mode toggle (desktop) -->
+  <div id="mode-toggle">
+    <button class="mode-btn active" id="btn-json-mode"  onclick="setMode('json')">JSON</button>
+    <button class="mode-btn"        id="btn-sql-mode"   onclick="setMode('sqlite')">SQLite</button>
+  </div>
+
+  <!-- Desktop menu bar -->
+  <div class="menu-group">
+    <div class="menu">
+      <button class="menu-btn">File</button>
+      <div class="menu-content">
+        <button onclick="newTable()">New</button>
+        <button onclick="showOpenModal()">Open</button>
+        <button onclick="Import.showModal()">Import…</button>
+        <button onclick="showSaveModal()">Save As</button>
+        <hr/>
+        <button onclick="showDeleteConfirm()" class="danger-item">Delete File</button>
+      </div>
+    </div>
+    <div class="menu">
+      <button class="menu-btn">Edit</button>
+      <div class="menu-content">
+        <button onclick="addRow()">Add Row</button>
+        <button onclick="addColumn()">Add Column</button>
+        <button onclick="removeRow()">Remove Row</button>
+        <button onclick="removeColumn()">Remove Column</button>
+      </div>
+    </div>
+    <div class="menu">
+      <button class="menu-btn">Export</button>
+      <div class="menu-content">
+        <button onclick="showExportModal()">Export…</button>
+      </div>
+    </div>
+    <div class="menu">
+      <button class="menu-btn">About</button>
+      <div class="menu-content">
+        <button onclick="loadPage('about-page')">About DataForge</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="topbar-right">
+    <span id="status-chip">saved</span>
+    <button id="theme-toggle" onclick="Theme.toggle()" title="Toggle theme">🌙</button>
+  </div>
+</div>
+
+<!-- ── Page Container ──────────────────────────────────────────────── -->
+<main class="pages">
+
+  <!-- TABLE PAGE -->
+  <section id="table-page" class="page active">
+    <div id="table-wrapper">
+      <table id="main-table">
+        <thead>
+          <tr id="header-row"></tr>
+          <tr id="schema-row"></tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ABOUT PAGE -->
+  <section id="about-page" class="page">
+    <div class="page-content">
+      <div class="page-header">
+        <div>
+          <h1>About</h1>
+          <p class="sub">Gnoke DataForge · v1.0</p>
+        </div>
+        <button class="btn-primary" onclick="loadPage('table-page')">← Back to Table</button>
+      </div>
+
+      <div class="about-grid">
+
+        <div class="form-card">
+          <h2 class="card-title">🗄️ Gnoke DataForge</h2>
+          <p class="hint">
+            DataForge is a tool built for <strong>vibe developers</strong> —
+            the new generation of engineers who build fast with AI assistants.<br><br>
+            The problem: every time you start a new AI session, you spend precious
+            tokens describing your data structure. DataForge fixes that.<br><br>
+            Build your table visually, export it as <strong>entity.json</strong>,
+            paste it into your AI prompt, and your assistant instantly understands
+            your schema — no explanation needed. Ship faster.
+          </p>
+        </div>
+
+        <div class="form-card">
+          <h2 class="card-title">📦 Export Formats</h2>
+          <table class="about-table">
+            <tbody>
+              <tr><td>.json</td><td>Flat normalized JSON</td></tr>
+              <tr><td>entity.json</td><td>AI-ready context format</td></tr>
+              <tr><td>.sql</td><td>CREATE + INSERT dump</td></tr>
+              <tr><td>.sqlite</td><td>Binary SQLite database</td></tr>
+              <tr><td>.csv</td><td>Comma-separated values</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="form-card">
+          <h2 class="card-title">⚙️ Under The Hood</h2>
+          <table class="about-table">
+            <tbody id="about-tech-table"></tbody>
+          </table>
+        </div>
+
+        <div class="form-card">
+          <h2 class="card-title">👤 Author</h2>
+          <p class="hint">
+            <strong>Edmund Sparrow</strong><br>
+            Part of the <strong>Gnoke Suite</strong> — offline-first web tools
+            for developers, librarians, and independent builders.
+          </p>
+          <div class="data-btns" style="margin-top:14px">
+            <a class="btn-outline" href="mailto:edmundsparrow@gmail.com" style="text-decoration:none">✉ Email</a>
+            <a class="btn-outline" href="https://wa.me/09024054758" target="_blank" rel="noopener" style="text-decoration:none">💬 WhatsApp</a>
+            <a class="btn-outline" href="https://github.com/edmundsparrow" target="_blank" rel="noopener" style="text-decoration:none">⌥ GitHub</a>
+          </div>
+        </div>
+
+        <div class="form-card">
+          <h2 class="card-title">📜 License</h2>
+          <p class="hint">
+            Free and open source under the
+            <strong>GNU General Public License v3.0</strong>.<br><br>
+            Use it, modify it, share it — but keep it open.
+            Commercial use requires explicit permission from the author.
+          </p>
+          <p class="hint" style="margin-top:10px;font-family:var(--font-mono);font-size:0.68rem;color:var(--muted)">
+            © 2026 Edmund Sparrow — Gnoke Suite
+          </p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- ── Modals ──────────────────────────────────────────────────────── -->
+
+<!-- Open -->
+<div class="modal-overlay" id="open-modal">
+  <div class="modal">
+    <div class="modal-head">
+      <h3>Open File</h3>
+      <button class="modal-close" onclick="closeModal('open-modal')">✕</button>
+    </div>
+    <ul id="open-file-list"></ul>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('open-modal')">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- Save As -->
+<div class="modal-overlay" id="save-modal">
+  <div class="modal">
+    <div class="modal-head">
+      <h3>Save As</h3>
+      <button class="modal-close" onclick="closeModal('save-modal')">✕</button>
+    </div>
+    <input type="text" id="save-name-input" placeholder="Table name…"/>
+    <div class="modal-actions">
+      <button class="btn btn-ghost"   onclick="closeModal('save-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="doSave()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- Import -->
+<div class="modal-overlay" id="import-modal">
+  <div class="modal">
+    <div class="modal-head">
+      <h3>Import</h3>
+      <button class="modal-close" onclick="closeModal('import-modal')">✕</button>
+    </div>
+
+    <div id="import-step-format">
+      <div class="export-grid">
+        <div class="export-opt" onclick="Import.fromJSON()">
+          <span class="icon">{ }</span>
+          <strong>.json</strong>
+          <span>Any JSON shape</span>
+        </div>
+        <div class="export-opt" onclick="Import.fromSQLite()">
+          <span class="icon">💾</span>
+          <strong>.sqlite / .db</strong>
+          <span>SQLite database</span>
+        </div>
+        <div class="export-opt" id="import-csv-card" onclick="Import.fromCSV()">
+          <span class="icon">📄</span>
+          <strong>.csv</strong>
+          <span>Comma-separated</span>
+        </div>
+        <div class="export-opt" onclick="Import.showPaste()">
+          <span class="icon">📋</span>
+          <strong>Paste text</strong>
+          <span>JSON or CSV</span>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn btn-ghost" onclick="closeModal('import-modal')">Cancel</button>
+      </div>
+    </div>
+
+    <div id="import-step-tables" style="display:none">
+      <p class="import-hint" id="import-step-tables-hint"></p>
+      <ul id="import-table-list"></ul>
+      <div class="modal-actions">
+        <button class="btn btn-ghost" onclick="Import._backToFormat()">← Back</button>
+      </div>
+    </div>
+
+    <div id="import-step-paste" style="display:none">
+      <p class="import-hint">Paste JSON or CSV below:</p>
+      <textarea id="import-paste-input" class="import-textarea"
+                placeholder="Paste your data here…" rows="8"></textarea>
+      <div class="modal-actions">
+        <button class="btn btn-ghost"   onclick="Import._backToFormat()">← Back</button>
+        <button class="btn btn-primary" onclick="Import.commitPaste()">Import</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Export -->
+<div class="modal-overlay" id="export-modal">
+  <div class="modal">
+    <div class="modal-head">
+      <h3>Export</h3>
+      <button class="modal-close" onclick="closeModal('export-modal')">✕</button>
+    </div>
+    <div class="export-grid">
+      <div class="export-opt" onclick="exportJSON()">
+        <span class="icon">{ }</span>
+        <strong>.json</strong>
+        <span>Flat JSON file</span>
+      </div>
+      <div class="export-opt" onclick="exportSQL()">
+        <span class="icon">🗄</span>
+        <strong>.sql</strong>
+        <span>CREATE + INSERT dump</span>
+      </div>
+      <div class="export-opt" onclick="exportSQLite()">
+        <span class="icon">💾</span>
+        <strong>.sqlite</strong>
+        <span>Binary SQLite DB</span>
+      </div>
+      <div class="export-opt recommended" onclick="exportEntityJSON()">
+        <span class="icon">📦</span>
+        <strong>entity.json</strong>
+        <span>AI-ready format ✦</span>
+      </div>
+      <div class="export-opt" onclick="exportCSV()">
+        <span class="icon">📄</span>
+        <strong>.csv</strong>
+        <span>Spreadsheet-ready</span>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('export-modal')">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- Delete confirm -->
+<div class="modal-overlay" id="confirm-modal">
+  <div class="modal">
+    <div class="modal-head">
+      <h3>Delete File</h3>
+      <button class="modal-close" onclick="closeModal('confirm-modal')">✕</button>
+    </div>
+    <div class="modal-body">
+      Delete <strong id="confirm-filename"></strong> from storage? This cannot be undone.
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost"  onclick="closeModal('confirm-modal')">Cancel</button>
+      <button class="btn btn-danger" onclick="doDelete()">Delete</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast"></div>
+
+<!-- ── Mobile Drawer ────────────────────────────────────────────────── -->
+<div id="drawer-overlay" onclick="Drawer.close()"></div>
+
+<nav id="drawer" aria-label="Mobile navigation">
+  <div id="drawer-header">
+    <div id="drawer-brand">
+      <span id="drawer-gnoke">Gnoke</span>
+      <span id="drawer-app">DataForge</span>
+    </div>
+    <button id="drawer-close" onclick="Drawer.close()" title="Close">✕</button>
+  </div>
+
+  <div id="drawer-mode">
+    <button class="mode-btn active" id="drawer-btn-json"
+            onclick="setMode('json'); Drawer.syncMode('json');">JSON</button>
+    <button class="mode-btn" id="drawer-btn-sqlite"
+            onclick="setMode('sqlite'); Drawer.syncMode('sqlite');">SQLite</button>
+  </div>
+
+  <div class="drawer-section">File</div>
+  <button class="drawer-btn" onclick="newTable(); Drawer.close();">New table</button>
+  <button class="drawer-btn" onclick="showOpenModal(); Drawer.close();">Open…</button>
+  <button class="drawer-btn" onclick="Import.showModal(); Drawer.close();">Import…</button>
+  <button class="drawer-btn" onclick="showSaveModal(); Drawer.close();">Save As…</button>
+  <button class="drawer-btn danger" onclick="showDeleteConfirm(); Drawer.close();">Delete file</button>
+
+  <div class="drawer-section">Edit</div>
+  <button class="drawer-btn" onclick="addRow(); Drawer.close();">Add row</button>
+  <button class="drawer-btn" onclick="addColumn(); Drawer.close();">Add column</button>
+  <button class="drawer-btn" onclick="removeRow(); Drawer.close();">Remove row</button>
+  <button class="drawer-btn" onclick="removeColumn(); Drawer.close();">Remove column</button>
+
+  <div class="drawer-section">Export</div>
+  <button class="drawer-btn" onclick="showExportModal(); Drawer.close();">Export…</button>
+
+  <div class="drawer-section">More</div>
+  <button class="drawer-btn" onclick="loadPage('about-page'); Drawer.close();">About DataForge</button>
+</nav>
+
+<!-- ── Scripts ─────────────────────────────────────────────────────── -->
+<script src="js/state.js"></script>
+<script src="js/theme.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/db-core.js"></script>
+<script src="js/normalizer.js"></script>
+<script src="js/table.js"></script>
+<script src="js/storage.js"></script>
+<script src="js/exporter.js"></script>
+<script src="js/csv.js"></script>
+<script src="js/import.js"></script>
+<script src="js/app.js"></script>
+
+<script>
+const Drawer = (() => {
+  const panel   = () => document.getElementById('drawer');
+  const overlay = () => document.getElementById('drawer-overlay');
+
+  function open() {
+    panel().classList.add('open');
+    overlay().classList.add('open');
+    document.body.style.overflow = 'hidden';
+    syncMode(State.mode === 'sqlite' ? 'sqlite' : 'json');
+  }
+
+  function close() {
+    panel().classList.remove('open');
+    overlay().classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  function syncMode(mode) {
+    document.getElementById('drawer-btn-json').classList.toggle('active', mode === 'json');
+    document.getElementById('drawer-btn-sqlite').classList.toggle('active', mode === 'sqlite');
+  }
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && panel().classList.contains('open')) close();
+  });
+
+  return { open, close, syncMode };
+})();
+</script>
+
+</body>
+</html>
