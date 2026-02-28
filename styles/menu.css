@@ -1,0 +1,69 @@
+/* ── Gnoke DataForge — menu.css ─────────────────────────────────── */
+
+/* ── Mode Toggle ─────────────────────────────────────────────────── */
+#mode-toggle {
+  display: flex;
+  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 20px;
+  padding: 3px; gap: 2px;
+  margin-left: 4px;
+}
+
+.mode-btn {
+  font-family: var(--font-mono);
+  font-size: 0.68rem; font-weight: 500;
+  padding: 4px 12px; border-radius: 16px;
+  border: none; cursor: pointer;
+  transition: all 0.18s;
+  background: transparent;
+  color: rgba(255,255,255,0.45);
+  letter-spacing: 0.04em;
+}
+.mode-btn.active {
+  background: var(--amber);
+  color: #fff;
+}
+
+/* ── Menu Bar ────────────────────────────────────────────────────── */
+.menu-group { display: flex; gap: 2px; margin-left: 4px; }
+.menu { position: relative; }
+
+.menu-btn {
+  font-family: var(--font-sans);
+  font-size: 0.82rem; font-weight: 500;
+  background: transparent; border: none;
+  color: rgba(255,255,255,0.75);
+  padding: 6px 10px; border-radius: 6px;
+  cursor: pointer;
+  transition: background var(--transition), color var(--transition);
+}
+.menu-btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
+
+.menu-content {
+  display: none;
+  position: absolute; top: calc(100% + 6px); left: 0;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-lg);
+  min-width: 168px; z-index: 200; overflow: hidden;
+}
+.menu:hover .menu-content,
+.menu:focus-within .menu-content { display: block; }
+
+.menu-content button {
+  display: block; width: 100%;
+  text-align: left; padding: 10px 16px;
+  background: transparent; border: none;
+  color: var(--text); font-family: var(--font-sans);
+  font-size: 0.85rem; cursor: pointer;
+  transition: background 0.12s;
+}
+.menu-content button:hover { background: var(--surface2); }
+.menu-content button.danger-item { color: var(--red); }
+.menu-content button.danger-item:hover { background: var(--red-lt); }
+
+.menu-content hr {
+  border: none; border-top: 1px solid var(--border); margin: 2px 0;
+}

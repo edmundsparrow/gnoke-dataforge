@@ -1,0 +1,96 @@
+/* ── Gnoke DataForge — theme.css ─────────────────────────────────── */
+/* Light theme default · Dark via [data-theme="dark"]               */
+
+:root,
+[data-theme="light"] {
+  --font-mono: 'DM Mono', monospace;
+  --font-sans: 'DM Sans', sans-serif;
+  --font-serif: 'Playfair Display', serif;
+  --radius: 10px;
+  --shadow: 0 1px 4px rgba(28,20,14,0.08), 0 2px 12px rgba(28,20,14,0.05);
+  --shadow-lg: 0 4px 24px rgba(28,20,14,0.14);
+  --transition: 0.2s ease;
+
+  --bg:         #f7f2ec;
+  --bg2:        #ede5d8;
+  --surface:    #ffffff;
+  --surface2:   #faf7f4;
+  --surface3:   #f3ede5;
+  --text:       #1c140e;
+  --text2:      #4a3728;
+  --muted:      #9c8070;
+  --border:     #e0d2c2;
+  --border2:    #ccbbaa;
+
+  --amber:      #c2722a;
+  --amber-dk:   #9e5a1e;
+  --amber-lt:   #faeade;
+  --amber-text: #7a3e10;
+
+  --green:      #2d6e4e;
+  --green-lt:   #dff2ea;
+  --red:        #b83030;
+  --red-lt:     #fde8e8;
+  --blue:       #1e5c99;
+  --blue-lt:    #ddeeff;
+  --accent2:    #2d6e4e;
+
+  --topbar-bg:  #1c140e;
+  --topbar-txt: #f7f2ec;
+
+  --th-bg:      #faf7f4;
+  --schema-bg:  #f3ede5;
+  --row-hover:  rgba(194,114,42,0.04);
+  --cell-focus-shadow: inset 0 0 0 1.5px var(--amber);
+}
+
+[data-theme="dark"] {
+  --bg:         #13100b;
+  --bg2:        #1e1812;
+  --surface:    #1e1912;
+  --surface2:   #261f16;
+  --surface3:   #2e2619;
+  --text:       #f0e6d8;
+  --text2:      #c8b49a;
+  --muted:      #7a6a58;
+  --border:     #2e2518;
+  --border2:    #3a2e1e;
+
+  --amber:      #d4843a;
+  --amber-dk:   #b86e28;
+  --amber-lt:   #2e1e0a;
+  --amber-text: #f0c080;
+
+  --green:      #3a8c62;
+  --green-lt:   #0e2418;
+  --red:        #c84040;
+  --red-lt:     #2a0e0e;
+  --blue:       #3a78c0;
+  --blue-lt:    #0e1e30;
+  --accent2:    #3a8c62;
+
+  --topbar-bg:  #0e0b07;
+  --topbar-txt: #f0e6d8;
+
+  --th-bg:      #1e1912;
+  --schema-bg:  #261f16;
+  --row-hover:  rgba(212,132,58,0.05);
+  --cell-focus-shadow: inset 0 0 0 1.5px var(--amber);
+
+  --shadow:     0 1px 4px rgba(0,0,0,0.3), 0 2px 12px rgba(0,0,0,0.2);
+  --shadow-lg:  0 4px 24px rgba(0,0,0,0.4);
+}
+
+/* ── Theme toggle button ─────────────────────────────────────────── */
+#theme-toggle {
+  width: 34px; height: 34px;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.15);
+  background: rgba(255,255,255,0.07);
+  color: var(--topbar-txt);
+  cursor: pointer; font-size: 15px;
+  display: flex; align-items: center; justify-content: center;
+  transition: border-color var(--transition), background var(--transition);
+  flex-shrink: 0;
+}
+#theme-toggle:hover { border-color: var(--amber); background: rgba(194,114,42,0.15); }
