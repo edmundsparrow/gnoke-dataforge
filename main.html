@@ -70,10 +70,10 @@
     <div class="menu">
       <button class="menu-btn">Edit</button>
       <div class="menu-content">
-        <button onclick="addRow()">Add Row</button>
-        <button onclick="addColumn()">Add Column</button>
-        <button onclick="removeRow()">Remove Row</button>
-        <button onclick="removeColumn()">Remove Column</button>
+        <button class="edit-action" onclick="addRow()">Add Row</button>
+        <button class="edit-action" onclick="addColumn()">Add Column</button>
+        <button class="edit-action" onclick="removeRow()">Remove Row</button>
+        <button class="edit-action" onclick="removeColumn()">Remove Column</button>
       </div>
     </div>
     <div class="menu">
@@ -92,8 +92,14 @@
 
   <div id="topbar-right">
     <span id="status-chip">saved</span>
+    <button id="lock-btn" title="Lock table" onclick="Lock.toggle()">🔓</button>
     <button id="theme-toggle" onclick="Theme.toggle()" title="Toggle theme">🌙</button>
   </div>
+</div>
+
+<!-- ── Lock Banner ──────────────────────────────────────────────────── -->
+<div id="lock-banner" onclick="Lock.unlock()" title="Click to unlock">
+  🔒 VIEW ONLY — click to unlock
 </div>
 
 <!-- ── Page Container ──────────────────────────────────────────────── -->
@@ -166,7 +172,7 @@
             for developers, librarians, and independent builders.
           </p>
           <div class="data-btns" style="margin-top:14px">
-            <a class="btn-outline" href="mailto:edmundsparrow@gmail.com" style="text-decoration:none">✉ Email</a>
+            <a class="btn-outline" href="/cdn-cgi/l/email-protection#b8dddcd5cdd6dccbc8d9cacad7cff8dfd5d9d1d496dbd7d5" style="text-decoration:none">✉ Email</a>
             <a class="btn-outline" href="https://wa.me/09024054758" target="_blank" rel="noopener" style="text-decoration:none">💬 WhatsApp</a>
             <a class="btn-outline" href="https://github.com/edmundsparrow" target="_blank" rel="noopener" style="text-decoration:none">⌥ GitHub</a>
           </div>
@@ -365,20 +371,24 @@
   <button class="drawer-btn danger" onclick="showDeleteConfirm(); Drawer.close();">Delete file</button>
 
   <div class="drawer-section">Edit</div>
-  <button class="drawer-btn" onclick="addRow(); Drawer.close();">Add row</button>
-  <button class="drawer-btn" onclick="addColumn(); Drawer.close();">Add column</button>
-  <button class="drawer-btn" onclick="removeRow(); Drawer.close();">Remove row</button>
-  <button class="drawer-btn" onclick="removeColumn(); Drawer.close();">Remove column</button>
+  <button class="drawer-btn edit-action" onclick="addRow(); Drawer.close();">Add row</button>
+  <button class="drawer-btn edit-action" onclick="addColumn(); Drawer.close();">Add column</button>
+  <button class="drawer-btn edit-action" onclick="removeRow(); Drawer.close();">Remove row</button>
+  <button class="drawer-btn edit-action" onclick="removeColumn(); Drawer.close();">Remove column</button>
 
   <div class="drawer-section">Export</div>
   <button class="drawer-btn" onclick="showExportModal(); Drawer.close();">Export…</button>
+
+  <div class="drawer-section">View</div>
+  <button class="drawer-btn" id="drawer-lock-btn"
+          onclick="Lock.toggle(); Drawer.close();">🔓  Lock table</button>
 
   <div class="drawer-section">More</div>
   <button class="drawer-btn" onclick="loadPage('about-page'); Drawer.close();">About DataForge</button>
 </nav>
 
 <!-- ── Scripts ─────────────────────────────────────────────────────── -->
-<script src="js/state.js"></script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="js/state.js"></script>
 <script src="js/theme.js"></script>
 <script src="js/ui.js"></script>
 <script src="js/db-core.js"></script>
@@ -388,6 +398,7 @@
 <script src="js/exporter.js"></script>
 <script src="js/csv.js"></script>
 <script src="js/import.js"></script>
+<script src="js/lock.js"></script>
 <script src="js/app.js"></script>
 
 <script>
